@@ -6,10 +6,10 @@ import (
 )
 
 type Schema struct {
+	Title      string                 `json:"title"`
 	Type       string                 `json:"type"`
 	Properties map[string]Property    `json:"properties"`
 	AllOf      []ConditionalStructure `json:"allOf,omitempty"`
-	UI         map[string]interface{} `json:"ui,omitempty"`
 }
 
 type Property struct {
@@ -40,9 +40,10 @@ type Builder struct {
 }
 
 // NewSchemaBuilder creates a new SchemaBuilder.
-func NewSchemaBuilder() *Builder {
+func NewSchemaBuilder(title string) *Builder {
 	return &Builder{
 		schema: Schema{
+			Title:      title,
 			Type:       "object",
 			Properties: make(map[string]Property),
 		},
@@ -60,28 +61,13 @@ func NewNumberWithWidget(title string, required bool, min, max, multipleOf *floa
 }
 
 func (b *Builder) Build() Schema {
-	// Include UI Order if specified
-	if len(b.uiOrder) > 0 {
-		if b.schema.UI == nil {
-			b.schema.UI = make(map[string]interface{})
-		}
-		b.schema.UI["ui:order"] = b.uiOrder
-	}
-
-	// Add UI properties to the schema
-	for propName, uiProp := range b.uiProperties {
-		if b.schema.UI == nil {
-			b.schema.UI = make(map[string]interface{})
-		}
-		b.schema.UI[propName] = uiProp
-	}
 	b.schema.AllOf = b.conditions
 	return b.schema
 }
 
-func buildAndDump(builder *Builder) {
-	schema := builder.Build()
-	jsonBytes, err := json.MarshalIndent(schema, "", "    ")
+func buildAndDump(generated *Generated) {
+
+	jsonBytes, err := json.MarshalIndent(generated, "", "    ")
 	if err != nil {
 		fmt.Println("Error marshaling JSON:", err)
 		return

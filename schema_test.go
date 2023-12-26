@@ -1,25 +1,38 @@
 package schema
 
 import (
+	"encoding/json"
+	"os"
 	"testing"
 )
+
+func PrintJOSN(x interface{}) {
+	ioWriter := os.Stdout
+	w := json.NewEncoder(ioWriter)
+	w.SetIndent("", "    ")
+	w.Encode(x)
+}
 
 // https://rjsf-team.github.io/react-jsonschema-form/
 // put json in here to test
 
 func Test_simple(t *testing.T) {
-	builder := NewSchemaBuilder()
+	builder := NewSchemaBuilder("HEY")
 
 	builder.NewString("exampleString", "Example String", true, 3, 10, "default value")
 	builder.NewNumber("exampleNumber", "Example Num", true, nil, nil, 11)
-	builder.AddUIOrder([]string{"exampleString", "exampleNumber"})
 
-	buildAndDump(builder)
+	ui := UI{}
+	ui.AddUIOrder([]string{"exampleString", "exampleNumber"})
+	out := &Generated{
+		Schema: builder.Build(),
+		UI:     ui,
+	}
+	buildAndDump(out)
 }
 
-// test case for IF THEN
 func Test_all(t *testing.T) {
-	builder := NewSchemaBuilder()
+	builder := NewSchemaBuilder("New Demo")
 
 	builder.NewString("exampleString", "Example String", true, 3, 10, "default value")
 
@@ -36,7 +49,6 @@ func Test_all(t *testing.T) {
 	// Adding a number property with range widget and multipleOf
 	multipleOfTen := 10.0
 	builder.AddProperty("integerRangeSteps", NewNumberWithWidget("Integer Range Steps", false, nil, nil, &multipleOfTen, 50, "range", nil))
-	builder.AddUIProperty("integerRangeSteps", UIProperty{Widget: "range"})
 
 	// Adding nested properties
 
@@ -56,15 +68,22 @@ func Test_all(t *testing.T) {
 
 	// password
 	builder.AddProperty("pass1", NewPassword("Password", 8))
-	builder.AddUIProperty("pass1", UIProperty{Widget: "password", Options: map[string]interface{}{"help": "Hint: Make it strong!"}})
-	builder.AddUIOrder([]string{"exampleString", "exampleNumber", "exampleEnumString", "ratio", "integerRangeSteps", "nestedObject", "tasks"})
-	buildAndDump(builder)
+
+	ui := UI{}
+	ui.AddUIOrder([]string{"exampleString", "exampleNumber", "exampleEnumString", "ratio", "integerRangeSteps", "nestedObject", "tasks"})
+	ui.AddUIProperty("integerRangeSteps", UIProperty{Widget: "range"})
+	ui.AddUIProperty("pass1", UIProperty{Widget: "password", Options: map[string]interface{}{"help": "Hint: Make it strong!"}})
+	out := &Generated{
+		Schema: builder.Build(),
+		UI:     ui,
+	}
+	buildAndDump(out)
 }
 
 // test case for IF THEN
 func Test_if(t *testing.T) {
 
-	builder := NewSchemaBuilder().
+	builder := NewSchemaBuilder("IF/THEN").
 		SetProperty("holidayType", Property{Type: "string", Enum: []string{"snow", "beach"}})
 
 	newCon := make(map[string]Property)
@@ -95,6 +114,10 @@ func Test_if(t *testing.T) {
 			Properties: newCon2,
 		},
 	})
-	buildAndDump(builder)
+
+	out := &Generated{
+		Schema: builder.Build(),
+	}
+	buildAndDump(out)
 
 }

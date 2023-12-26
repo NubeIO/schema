@@ -1,20 +1,25 @@
 package schema
 
+type UI struct {
+	UiOrder      []string              `json:"ui:order"`
+	UiProperties map[string]UIProperty `json:"uiProperties"`
+}
+
 type UIProperty struct {
 	Widget  string                 `json:"ui:widget,omitempty"`
 	Options map[string]interface{} `json:"ui:options,omitempty"`
 }
 
 // AddUIOrder sets the UI order of properties.
-func (b *Builder) AddUIOrder(order []string) *Builder {
-	b.uiOrder = order
-	return b
+func (b *UI) AddUIOrder(order []string) {
+	b.UiOrder = order
+	return
 }
 
-func (b *Builder) AddUIProperty(propertyName string, uiProp UIProperty) *Builder {
-	if b.uiProperties == nil {
-		b.uiProperties = make(map[string]UIProperty)
+func (b *UI) AddUIProperty(propertyName string, uiProp UIProperty) {
+	if b.UiProperties == nil {
+		b.UiProperties = make(map[string]UIProperty)
 	}
-	b.uiProperties[propertyName] = uiProp
-	return b
+	b.UiProperties[propertyName] = uiProp
+
 }
