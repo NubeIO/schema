@@ -7,14 +7,24 @@ import (
 // https://rjsf-team.github.io/react-jsonschema-form/
 // put json in here to test
 
-// test case for IF THEN
-func Test_basic(t *testing.T) {
+func Test_simple(t *testing.T) {
 	builder := NewSchemaBuilder()
 
-	builder.AddProperty("exampleString", NewString("Example String", true, 3, 10, "default value"))
+	builder.NewString("exampleString", "Example String", true, 3, 10, "default value")
+	builder.NewNumber("exampleNumber", "Example Num", true, nil, nil, 11)
+	builder.AddUIOrder([]string{"exampleString", "exampleNumber"})
+
+	buildAndDump(builder)
+}
+
+// test case for IF THEN
+func Test_all(t *testing.T) {
+	builder := NewSchemaBuilder()
+
+	builder.NewString("exampleString", "Example String", true, 3, 10, "default value")
 
 	// Adding a number property
-	builder.AddProperty("exampleNumber", NewNumber("Example Number", false, nil, nil, 42))
+	builder.NewNumber("exampleString", "Example String", true, nil, nil, 11)
 
 	// Adding an enum string property
 	builder.AddProperty("exampleEnumString", NewEnumString("Example Enum String", []string{"a", "b"}, []string{"Option A", "Option B"}))
