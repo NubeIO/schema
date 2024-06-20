@@ -19,6 +19,25 @@ func (b *Builder) NewString(name, title string, required bool, minLength, maxLen
 	return b
 }
 
+func (b *Builder) NewBool(name, title string, required bool, defaultValue bool) *Builder {
+	n := NewBool(title, required, defaultValue)
+	b.AddProperty(name, n)
+	return b
+}
+
+// NewBool creates a new bool property.
+func NewBool(title string, required bool, defaultValue bool) Property {
+	prop := Property{
+		Type:    "boolean",
+		Title:   title,
+		Default: defaultValue,
+	}
+	if required {
+		prop.Required = []string{title}
+	}
+	return prop
+}
+
 // NewString creates a new string property.
 func NewString(title string, required bool, minLength, maxLength int, defaultValue string) Property {
 	prop := Property{
